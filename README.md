@@ -121,17 +121,18 @@ def predict_repayment(request: PredictRequest) -> Dict:
             "high"
         )
 
-        summary = {
-            "on_time_count": int(on_time_count),
-            "late_count": int(late_count),
-            "defaulted_count": int(defaulted_count),
-            "total_payments": total_payments,
-            "on_time_ratio": round(on_time_count / total_payments, 4) if total_payments > 0 else 0.0,
-            "late_ratio": round(late_count / total_payments, 4) if total_payments > 0 else 0.0,
-            "defaulted_ratio": round(defaulted_count / total_payments, 4) if total_payments > 0 else 0.0,
-            "average_delay_days": float(round(record["days_late"].mean(), 2)),
-            "max_delay_days": int(record["days_late"].max())
-        }
+                summary = {
+    # Summarize payment status counts (from categorical payment_status)
+        "on_time_count" :int(on_time_count),
+        "missed_count" : int(missed_count),
+        "due_count" :int(due_count),
+        "total_payments" :int(total_payments),
+        "on_time_ratio": float(round(on_time_count / total_payments, 4)) if total_payments > 0 else 0.0,
+        "missed_ratio": float(round(missed_count / total_payments, 4)) if total_payments > 0 else 0.0,
+        "due_ratio": float(round(due_count / total_payments, 4)) if total_payments > 0 else 0.0,
+    "average_delay_days": float(round(record["borrower_history_delays"].mean(), 2)) if "borrower_history_delays" in record.columns else None,
+    "max_delay_days": int(record["borrower_history_delays"].max()) if "borrower_history_delays" in record.columns else None
+}
 
         output = {
             "borrower_repayment_summary": summary,
